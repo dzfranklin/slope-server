@@ -1,4 +1,4 @@
-use anyhow::{bail, Context, Result};
+use anyhow::{Context, Result, bail};
 use image::GenericImageView;
 
 /// Encoding scheme used by the upstream DEM tile source.
@@ -11,13 +11,14 @@ pub enum DemEncoding {
 }
 
 impl DemEncoding {
-    /// Parse from TileJSON `encoding` field. Anything other than "terrarium"
-    /// is treated as Mapbox (the more common default).
-    pub fn from_str(s: &str) -> Self {
+    /// Parse from TileJSON `encoding` field. Returns `None` for unrecognised values.
+    pub fn from_str(s: &str) -> Option<Self> {
         if s.eq_ignore_ascii_case("terrarium") {
-            DemEncoding::Terrarium
+            Some(DemEncoding::Terrarium)
+        } else if s.eq_ignore_ascii_case("mapbox") {
+            Some(DemEncoding::Mapbox)
         } else {
-            DemEncoding::Mapbox
+            None
         }
     }
 }
@@ -92,9 +93,9 @@ mod tests {
 
     #[test]
     fn encoding_from_str() {
-        assert_eq!(DemEncoding::from_str("terrarium"), DemEncoding::Terrarium);
-        assert_eq!(DemEncoding::from_str("Terrarium"), DemEncoding::Terrarium);
-        assert_eq!(DemEncoding::from_str("mapbox"), DemEncoding::Mapbox);
-        assert_eq!(DemEncoding::from_str(""), DemEncoding::Mapbox);
+        assert_eq!(DemEncoding::from_str("terrarium"), Some(DemEncoding::Terrarium));
+        assert_eq!(DemEncoding::from_str("Terrarium"), Some(DemEncoding::Terrarium));
+        assert_eq!(DemEncoding::from_str("mapbox"), Some(DemEncoding::Mapbox));
+        assert_eq!(DemEncoding::from_str(""), None);
     }
 }

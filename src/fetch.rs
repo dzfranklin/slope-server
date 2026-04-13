@@ -38,11 +38,7 @@ pub async fn fetch_tile(
         Ok(FetchResult::Bytes(bytes))
     } else if status == reqwest::StatusCode::NOT_FOUND {
         Ok(FetchResult::NotFound)
-    } else if status.is_server_error() {
-        Ok(FetchResult::ServerError(status.as_u16()))
     } else {
-        // Other 4xx (e.g. 401, 403) — treat as not found to avoid blocking.
-        tracing::warn!(url = %url, status = %status, "unexpected upstream status");
-        Ok(FetchResult::NotFound)
+        Ok(FetchResult::ServerError(status.as_u16()))
     }
 }

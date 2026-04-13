@@ -154,12 +154,9 @@ pub async fn demo(State(state): State<AppState>) -> impl IntoResponse {
     let zoom = tj.minzoom.max(4);
 
     let html = include_str!("demo.html")
-        .replace("__SLOPE_URL__", &slope_url)
         .replace("__CENTER_LON__", &center_lon.to_string())
         .replace("__CENTER_LAT__", &center_lat.to_string())
-        .replace("__ZOOM__", &zoom.to_string())
-        .replace("__MINZOOM__", &tj.minzoom.to_string())
-        .replace("__MAXZOOM__", &tj.maxzoom.to_string());
+        .replace("__ZOOM__", &zoom.to_string());
 
     (
         StatusCode::OK,

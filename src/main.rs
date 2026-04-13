@@ -10,6 +10,8 @@ use slope_server::{
     tilejson::OutputTileJson,
 };
 
+const MIN_MINZOOM: u32 = 9;
+
 #[tokio::main]
 async fn main() -> Result<()> {
     tracing_subscriber::registry()
@@ -44,7 +46,7 @@ async fn main() -> Result<()> {
 
     let output_tilejson = OutputTileJson::new(
         tile_url,
-        upstream.minzoom,
+        upstream.minzoom.max(MIN_MINZOOM),
         upstream.maxzoom,
         upstream.bounds,
         upstream.attribution.clone(),
@@ -62,7 +64,38 @@ async fn main() -> Result<()> {
 
     let listener = tokio::net::TcpListener::bind(&addr).await?;
     tracing::info!(addr = %addr, "listening");
-    axum::serve(listener, app).await?;
+    axum::serve(listener, app)
+        .with_graceful_shutdown(shutdown_signal())
+        .await?;
 
+    tracing::info!("server shut down");
     Ok(())
+}
+
+async fn shutdown_signal() {
+    use tokio::signal;
+
+    let ctrl_c = async {
+        signal::ctrl_c()
+            .await
+            .expect("failed to install Ctrl+C handler");
+    };
+
+    #[cfg(unix)]
+    let sigterm = async {
+        signal::unix::signal(signal::unix::SignalKind::terminate())
+            .expect("failed to install SIGTERM handler")
+            .recv()
+            .await;
+    };
+
+    #[cfg(not(unix))]
+    let sigterm = std::future::pending::<()>();
+
+    tokio::select! {
+        _ = ctrl_c => {},
+        _ = sigterm => {},
+    }
+
+    tracing::info!("shutdown signal received");
 }
