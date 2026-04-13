@@ -42,7 +42,7 @@ async fn main() -> Result<()> {
     // path placeholder. Operators can override by setting OUTPUT_TILE_URL_BASE.
     let tile_url_base =
         std::env::var("OUTPUT_TILE_URL_BASE").unwrap_or_else(|_| format!("http://{addr}/slope"));
-    let tile_url = format!("{tile_url_base}/{{z}}/{{x}}/{{y}}.webp");
+    let tile_url = format!("{tile_url_base}/{{z}}/{{x}}/{{y}}");
 
     let output_tilejson = OutputTileJson::new(
         tile_url,

@@ -41,7 +41,7 @@ impl From<anyhow::Error> for AppError {
     }
 }
 
-/// GET /slope/{z}/{x}/{y}  (y may include a .webp extension)
+/// GET /slope/{z}/{x}/{y}
 pub async fn slope_tile(
     State(state): State<AppState>,
     Path((z, x, y)): Path<(u32, u32, u32)>,
