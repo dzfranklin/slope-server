@@ -147,11 +147,15 @@ pub async fn healthz() -> impl IntoResponse {
 /// GET /demo  — MapLibre GL JS map with OSM base + slope color-relief layer
 pub async fn demo(State(state): State<AppState>) -> impl IntoResponse {
     let tj = &*state.output_tilejson;
-    let slope_url = tj.tiles.first().cloned().unwrap_or_default();
+    let zoom = tj.minzoom.max(10);
     let [west, south, east, north] = tj.bounds;
-    let center_lat = (south + north) / 2.0;
-    let center_lon = (west + east) / 2.0;
-    let zoom = tj.minzoom.max(4);
+    let mut center_lat = (south + north) / 2.0;
+    let mut center_lon = (west + east) / 2.0;
+    if center_lat == 0.0 && center_lon == 0.0 {
+        // Default to Lake District if bounds are missing or global
+        center_lat = 54.5037;
+        center_lon = -3.1522;
+    }
 
     let html = include_str!("demo.html")
         .replace("__CENTER_LON__", &center_lon.to_string())

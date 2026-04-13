@@ -1,5 +1,5 @@
 use anyhow::{Context, Result};
-use image::{codecs::webp::WebPEncoder, ColorType, ImageEncoder};
+use image::{ColorType, ImageEncoder, codecs::webp::WebPEncoder};
 
 /// Pack slope in degrees into Mapbox Terrain-RGB bytes.
 ///
@@ -68,10 +68,7 @@ mod tests {
         let [r, g, b] = slope_to_terrain_rgb(0.0);
         let decoded = terrain_rgb_to_height(r, g, b);
         // Decoded height should be ~0 (since we stored slope=0 as height=0).
-        assert!(
-            decoded.abs() < 0.1,
-            "round-trip 0°: decoded={decoded}"
-        );
+        assert!(decoded.abs() < 0.1, "round-trip 0°: decoded={decoded}");
     }
 
     #[test]

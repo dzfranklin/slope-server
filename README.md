@@ -27,3 +27,11 @@ RUST_LOG=slope_server=debug \
 docker build -t slope-server .
 docker run -p 8080:8080 slope-server
 ```
+
+Visit http://localhost:8080/demo
+
+## Development
+
+```bash
+git config core.hooksPath .githooks
+```

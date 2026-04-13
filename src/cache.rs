@@ -1,12 +1,12 @@
 use std::sync::Arc;
 use std::time::Duration;
 
-use anyhow::{anyhow, Result};
+use anyhow::{Result, anyhow};
 use moka::future::Cache;
 
 use crate::config::UpstreamConfig;
 use crate::decode::decode_tile;
-use crate::fetch::{fetch_tile, FetchResult};
+use crate::fetch::{FetchResult, fetch_tile};
 use crate::stitch::ElevationTile;
 use crate::tile::TileCoord;
 use crate::tilejson::OutputTileJson;
@@ -68,9 +68,9 @@ pub async fn fetch_or_cached(state: &AppState, coord: TileCoord) -> Result<Optio
 
     match result {
         FetchResult::NotFound => Ok(None),
-        FetchResult::ServerError(status) => {
-            Err(anyhow!("upstream returned HTTP {status} for tile {coord:?}"))
-        }
+        FetchResult::ServerError(status) => Err(anyhow!(
+            "upstream returned HTTP {status} for tile {coord:?}"
+        )),
         FetchResult::Bytes(bytes) => {
             let elevations = Arc::new(decode_tile(&bytes, state.upstream.encoding)?);
             state.cache.insert(coord, Arc::clone(&elevations)).await;

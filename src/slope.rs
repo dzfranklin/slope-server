@@ -114,12 +114,19 @@ mod tests {
         //   (sign depends on convention; magnitude is 8)
         //   slope = atan(sqrt(64) * (1/8)) = atan(1) = 45°
         let e = 0.0f32;
-        let win = [e - 1.0, e, e + 1.0, e - 1.0, e, e + 1.0, e - 1.0, e, e + 1.0];
+        let win = [
+            e - 1.0,
+            e,
+            e + 1.0,
+            e - 1.0,
+            e,
+            e + 1.0,
+            e - 1.0,
+            e,
+            e + 1.0,
+        ];
         let slope = horn_kernel(win, 1.0, 1.0);
-        assert!(
-            (slope - 45.0).abs() < 1e-4,
-            "expected 45°, got {slope}"
-        );
+        assert!((slope - 45.0).abs() < 1e-4, "expected 45°, got {slope}");
     }
 
     #[test]

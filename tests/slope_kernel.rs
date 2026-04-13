@@ -31,10 +31,7 @@ fn load_f32(path: &str) -> Vec<f32> {
 
 fn fixture(name: &str) -> String {
     // Fixtures live in testdata/ relative to the workspace root.
-    format!(
-        "{}/testdata/{name}",
-        env!("CARGO_MANIFEST_DIR")
-    )
+    format!("{}/testdata/{name}", env!("CARGO_MANIFEST_DIR"))
 }
 
 fn run_horn_on_padded(padded: &[f32], inv_ew: f32, inv_ns: f32) -> Vec<f32> {
@@ -121,10 +118,18 @@ fn buachaille_etive_mor_vs_gdaldem() {
     const REAL_PAD: usize = REAL_TILE + 2;
 
     let padded = load_f32(&fixture("buachaille_padded.bin"));
-    assert_eq!(padded.len(), REAL_PAD * REAL_PAD, "padded buffer wrong size");
+    assert_eq!(
+        padded.len(),
+        REAL_PAD * REAL_PAD,
+        "padded buffer wrong size"
+    );
 
     let reference = load_f32(&fixture("buachaille_slopes.bin"));
-    assert_eq!(reference.len(), REAL_TILE * REAL_TILE, "reference slopes wrong size");
+    assert_eq!(
+        reference.len(),
+        REAL_TILE * REAL_TILE,
+        "reference slopes wrong size"
+    );
 
     // Use the same scale factors our server would use for this tile.
     let (inv_ew, inv_ns) = mercator_scale_factors(Z, CY, REAL_TILE as u32);
@@ -134,13 +139,13 @@ fn buachaille_etive_mor_vs_gdaldem() {
     for row in 0..REAL_TILE {
         for col in 0..REAL_TILE {
             let win = [
-                padded[ row      * REAL_PAD + col    ],
-                padded[ row      * REAL_PAD + col + 1],
-                padded[ row      * REAL_PAD + col + 2],
-                padded[(row + 1) * REAL_PAD + col    ],
+                padded[row * REAL_PAD + col],
+                padded[row * REAL_PAD + col + 1],
+                padded[row * REAL_PAD + col + 2],
+                padded[(row + 1) * REAL_PAD + col],
                 padded[(row + 1) * REAL_PAD + col + 1],
                 padded[(row + 1) * REAL_PAD + col + 2],
-                padded[(row + 2) * REAL_PAD + col    ],
+                padded[(row + 2) * REAL_PAD + col],
                 padded[(row + 2) * REAL_PAD + col + 1],
                 padded[(row + 2) * REAL_PAD + col + 2],
             ];
@@ -157,7 +162,8 @@ fn buachaille_etive_mor_vs_gdaldem() {
         assert!(
             diff < 0.5,
             "pixel {i} (row={}, col={}): got {got:.4}°, expected {expected:.4}°, diff {diff:.4}°",
-            i / REAL_TILE, i % REAL_TILE,
+            i / REAL_TILE,
+            i % REAL_TILE,
         );
     }
     let mean_diff = sum_diff / (REAL_TILE * REAL_TILE) as f64;

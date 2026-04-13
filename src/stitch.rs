@@ -25,7 +25,12 @@ pub fn stitch_padded(tiles: [[Option<ElevationTile>; 3]; 3], tile_size: u32) -> 
     // pixel (r, c) — clamped to [0, n-1]. When the tile is absent, falls back
     // to the nearest edge pixel of the center tile: the edge row/col closest
     // to the missing neighbor, at the same r or c as requested (clamped).
-    let get = |tiles: &[[Option<ElevationTile>; 3]; 3], tr: usize, tc: usize, r: usize, c: usize| -> f32 {
+    let get = |tiles: &[[Option<ElevationTile>; 3]; 3],
+               tr: usize,
+               tc: usize,
+               r: usize,
+               c: usize|
+     -> f32 {
         let r = r.min(n - 1);
         let c = c.min(n - 1);
         match &tiles[tr][tc] {
@@ -37,8 +42,16 @@ pub fn stitch_padded(tiles: [[Option<ElevationTile>; 3]; 3], tile_size: u32) -> 
                 // For a west  neighbor (tc=0) missing: use center's left col (cc=0), same row.
                 // For an east neighbor (tc=2) missing: use center's right col (cc=n-1), same row.
                 // Corners: both row and col snap to the nearest corner of center.
-                let cr = match tr { 0 => 0, 2 => n - 1, _ => r };
-                let cc = match tc { 0 => 0, 2 => n - 1, _ => c };
+                let cr = match tr {
+                    0 => 0,
+                    2 => n - 1,
+                    _ => r,
+                };
+                let cc = match tc {
+                    0 => 0,
+                    2 => n - 1,
+                    _ => c,
+                };
                 match &tiles[1][1] {
                     Some(t) => t[cr * n + cc],
                     None => 0.0,
@@ -135,7 +148,10 @@ mod tests {
         for col in 0..n {
             let expected = (0 * 10 + col) as f32; // center top row
             let got = buf[0 * padded + col + 1];
-            assert_eq!(got, expected, "top border col {col}: got {got}, expected {expected}");
+            assert_eq!(
+                got, expected,
+                "top border col {col}: got {got}, expected {expected}"
+            );
         }
 
         // Left border (padded col 0) should replicate center tile's left col (col 0).
@@ -157,8 +173,8 @@ mod tests {
         let buf = stitch_padded(tiles, n as u32);
 
         // Center tile is at rows [1..=n], cols [1..=n] in padded buffer.
-        assert_eq!(buf[1 * padded + 1], 0.0);  // center[0][0]
-        assert_eq!(buf[1 * padded + 2], 1.0);  // center[0][1]
+        assert_eq!(buf[1 * padded + 1], 0.0); // center[0][0]
+        assert_eq!(buf[1 * padded + 2], 1.0); // center[0][1]
         assert_eq!(buf[2 * padded + 1], 10.0); // center[1][0]
         assert_eq!(buf[2 * padded + 2], 11.0); // center[1][1]
     }

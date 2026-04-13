@@ -56,7 +56,7 @@ pub async fn load_upstream_config(client: &reqwest::Client) -> Result<UpstreamCo
     let encoding = tj
         .encoding
         .as_deref()
-        .and_then(DemEncoding::from_str)
+        .and_then(DemEncoding::parse)
         .unwrap_or(DemEncoding::Mapbox);
 
     let minzoom = tj.minzoom.unwrap_or(0);

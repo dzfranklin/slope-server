@@ -12,7 +12,7 @@ pub enum DemEncoding {
 
 impl DemEncoding {
     /// Parse from TileJSON `encoding` field. Returns `None` for unrecognised values.
-    pub fn from_str(s: &str) -> Option<Self> {
+    pub fn parse(s: &str) -> Option<Self> {
         if s.eq_ignore_ascii_case("terrarium") {
             Some(DemEncoding::Terrarium)
         } else if s.eq_ignore_ascii_case("mapbox") {
@@ -93,9 +93,15 @@ mod tests {
 
     #[test]
     fn encoding_from_str() {
-        assert_eq!(DemEncoding::from_str("terrarium"), Some(DemEncoding::Terrarium));
-        assert_eq!(DemEncoding::from_str("Terrarium"), Some(DemEncoding::Terrarium));
-        assert_eq!(DemEncoding::from_str("mapbox"), Some(DemEncoding::Mapbox));
-        assert_eq!(DemEncoding::from_str(""), None);
+        assert_eq!(
+            DemEncoding::parse("terrarium"),
+            Some(DemEncoding::Terrarium)
+        );
+        assert_eq!(
+            DemEncoding::parse("Terrarium"),
+            Some(DemEncoding::Terrarium)
+        );
+        assert_eq!(DemEncoding::parse("mapbox"), Some(DemEncoding::Mapbox));
+        assert_eq!(DemEncoding::parse(""), None);
     }
 }
