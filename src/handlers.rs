@@ -110,7 +110,7 @@ pub async fn slope_tile(
         StatusCode::OK,
         [
             (header::CONTENT_TYPE, "image/webp"),
-            (header::CACHE_CONTROL, "public, max-age=86400"),
+            (header::CACHE_CONTROL, "public, max-age=31536000, immutable"),
         ],
         webp_bytes,
     )
