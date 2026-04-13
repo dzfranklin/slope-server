@@ -1,0 +1,32 @@
+[package]
+name = "slope-server"
+version = "0.1.0"
+edition = "2024"
+
+[[bin]]
+name = "slope-server"
+path = "src/main.rs"
+
+[lib]
+name = "slope_server"
+path = "src/lib.rs"
+
+[dependencies]
+axum = { version = "0.8", features = ["macros"] }
+tower = "0.5"
+tower-http = { version = "0.6", features = ["trace", "compression-gzip", "cors"] }
+tokio = { version = "1", features = ["full"] }
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "json"] }
+image = { version = "0.25", default-features = false, features = ["png", "webp"] }
+moka = { version = "0.12", features = ["future"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+anyhow = "1"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+bytes = "1"
+futures = "0.3.32"
+
+[dev-dependencies]
+tokio = { version = "1", features = ["full"] }
+approx = "0.5"
