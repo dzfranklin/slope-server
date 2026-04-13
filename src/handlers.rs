@@ -48,18 +48,15 @@ pub async fn slope_tile(
 ) -> Result<Response, AppError> {
     let upstream = &state.upstream;
 
-    // ── Validate zoom range ───────────────────────────────────────────────────
     if z < upstream.minzoom || z > upstream.maxzoom {
         return Err(AppError::NotFound);
     }
 
-    // ── Validate geographic bounds ────────────────────────────────────────────
     let coord = TileCoord::new(z, x, y);
     if !coord.intersects_bounds(&upstream.bounds) {
         return Err(AppError::NotFound);
     }
 
-    // ── Build 3×3 neighbor grid ───────────────────────────────────────────────
     let neighbor_grid = coord.neighbors_3x3();
 
     // Flatten to a Vec of (grid_row, grid_col, Option<TileCoord>) for async fetching.
@@ -69,7 +66,7 @@ pub async fn slope_tile(
         .flat_map(|(r, row)| row.iter().enumerate().map(move |(c, tc)| (r, c, *tc)))
         .collect();
 
-    // ── Fetch all 9 tiles concurrently ───────────────────────────────────────
+    // Fetch all 9 tiles concurrently
     let futures: Vec<_> = fetch_tasks
         .iter()
         .map(|&(r, c, tc)| {
@@ -86,18 +83,14 @@ pub async fn slope_tile(
 
     let results = future::join_all(futures).await;
 
-    // ── Assemble the tile grid, checking for errors ───────────────────────────
+    // Assemble the tile grid, checking for errors
     let mut tiles: [[Option<ElevationTile>; 3]; 3] = Default::default();
-
     for (r, c, result) in results {
         match result {
             Ok(maybe_tile) => {
                 tiles[r][c] = maybe_tile;
             }
             Err(e) => {
-                // Any fetch error (including upstream 5xx for any tile) → 502.
-                // We do NOT silently edge-replicate on server errors — that would
-                // hide upstream problems while producing subtly wrong output.
                 return Err(AppError::BadGateway(format!("upstream error: {e:#}")));
             }
         }
@@ -108,14 +101,9 @@ pub async fn slope_tile(
         return Err(AppError::NotFound);
     }
 
-    // ── Stitch padded buffer ──────────────────────────────────────────────────
     let tile_size = upstream.tile_size;
     let padded = stitch_padded(tiles, tile_size);
-
-    // ── Compute slope ─────────────────────────────────────────────────────────
     let slopes = compute_slope(&padded, tile_size, z, y);
-
-    // ── Encode as lossless WebP ───────────────────────────────────────────────
     let webp_bytes = encode_slope_webp(&slopes, tile_size).map_err(AppError::Internal)?;
 
     Ok((
