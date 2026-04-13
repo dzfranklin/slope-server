@@ -41,8 +41,8 @@ async fn main() -> Result<()> {
     // runtime — in production, we rewrite the host, so we use a relative
     // path placeholder. Operators can override by setting OUTPUT_TILE_URL_BASE.
     let tile_url_base =
-        std::env::var("OUTPUT_TILE_URL_BASE").unwrap_or_else(|_| format!("http://{addr}"));
-    let tile_url = format!("{tile_url_base}/slope/{{z}}/{{x}}/{{y}}.webp");
+        std::env::var("OUTPUT_TILE_URL_BASE").unwrap_or_else(|_| format!("http://{addr}/slope"));
+    let tile_url = format!("{tile_url_base}/{{z}}/{{x}}/{{y}}.webp");
 
     let output_tilejson = OutputTileJson::new(
         tile_url,
