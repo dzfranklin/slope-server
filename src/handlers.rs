@@ -44,13 +44,8 @@ impl From<anyhow::Error> for AppError {
 /// GET /slope/{z}/{x}/{y}  (y may include a .webp extension)
 pub async fn slope_tile(
     State(state): State<AppState>,
-    Path((z, x, y_raw)): Path<(u32, u32, String)>,
+    Path((z, x, y)): Path<(u32, u32, u32)>,
 ) -> Result<Response, AppError> {
-    // Strip optional .webp extension — axum doesn't support mixed
-    // parameter+literal segments like `{y}.webp` in a single path segment.
-    let y_str = y_raw.strip_suffix(".webp").unwrap_or(&y_raw);
-    let y: u32 = y_str.parse().map_err(|_| AppError::NotFound)?;
-
     let upstream = &state.upstream;
 
     // ── Validate zoom range ───────────────────────────────────────────────────
