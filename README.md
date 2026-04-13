@@ -6,12 +6,12 @@ A simple server that turns Terrain DEM tiles into slope angle tiles.
 
 ```bash
 docker run -p 8080:8080 \
-  -e UPSTREAM_TILEJSON="https://tiles.mapterhorn.com/tilejson.json"
+  -e UPSTREAM_TILEJSON="https://tiles.mapterhorn.com/tilejson.json" \
   -e OUTPUT_TILE_URL_BASE="https://example.com" \
-  ghcr.io/dzfranklin/slop-server
+  ghcr.io/dzfranklin/slope-server:latest
 ```
 
-*Running locally*
+**Running locally**
 
 ```bash
 RUST_LOG=slope_server=debug \
